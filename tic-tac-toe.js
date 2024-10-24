@@ -142,3 +142,25 @@ document.getElementById('Restart').addEventListener('click', () => {
     });
 });
 
+
+
+// Exercise 6  
+const squares = document.querySelectorAll('#board div');
+
+for (let i = 0; i < squares.length; i++) {
+    squares[i].addEventListener('click', () => {
+        // Prevent changes if the square already has a value
+        if (squares[i].textContent) return; 
+
+        // Set the square's content and update the board state
+        const player = isXPlayer ? 'X' : 'O';
+        squares[i].textContent = player;
+        squares[i].classList.add(player);
+
+        // Toggle player turn
+        isXPlayer = !isXPlayer;
+
+        // Check for a winner
+        checkForWinner();
+    });
+}
