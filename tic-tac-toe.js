@@ -21,7 +21,6 @@ let gameBoard = Array(9).fill(null);  // Initialize game board with 9 nulls
 
 // Selects all the elements with div id "board", then goes through each element in varying positions
 document.querySelectorAll("#board div").forEach(function (square, index) {
-    
     square.addEventListener("click", function () { // Adds a click event listener function so it can address the square on command
         if (gameBoard[index] === "") {  // If the square is empty then ..
             square.textContent = currentPlayer; // It will take the content inside the square as the value to represent the current player
@@ -39,3 +38,33 @@ document.querySelectorAll("#board div").forEach(function (square, index) {
         }
     });
 });
+
+
+// Excerise 3
+// Function to change style when mouse hovers over square
+document.addEventListener("DOMContentLoaded", function () {
+    let squares = document.querySelectorAll("#board div");
+  
+    // Add event listeners for hover effect
+    squares.forEach(function (square) {
+      square.addEventListener("mouseover", handleMouseOver);   
+      square.addEventListener("mouseout", handleMouseOut);    
+    });
+  });
+  
+  // Function to handle hover (mouseover) effect
+  function handleMouseOver(event) {
+    const gameSquare = event.target;  // Get the square that triggered the event
+    // Add hover class only if the square is empty
+    if (gameSquare.textContent === "") {
+      gameSquare.classList.add("hover");
+    }
+  }
+  
+  // Function to handle mouseout effect (removing hover class)
+  function handleMouseOut(event) {
+    const gameSquare = event.target;  // Get the square that triggered the event
+    gameSquare.classList.remove("hover");
+  }
+  
+  
