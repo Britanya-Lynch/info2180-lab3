@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // The square function is for each element in div
     squares.forEach(function (square) {
-            square.classList.add("square");  // Adding the
+            square.classList.add("square");  // Adding the class
             console.log("Square styled:", square);  // To track the progress of each square being logged to be styled
     });
 });
