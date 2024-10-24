@@ -121,3 +121,24 @@ function checkForWinner() {
 }
 
 
+
+// Exercise 5
+// Restart the game
+document.getElementById('Restart').addEventListener('click', () => {
+    // Reset status message
+    const statusMsg = document.getElementById('status');
+    statusMsg.textContent = 'Move your mouse over a square and click to play an X or an O.';
+    statusMsg.classList.remove('you-won'); // Removing 'you-won' class
+
+    // Reset game state and player turn
+    boardState = Array(9).fill(null); // Clear the board state
+    isXPlayer = true; // Setting X as the first player
+
+    // Reset each square's content and re-enable clicks
+    document.querySelectorAll('#board div').forEach(square => {
+        square.textContent = ''; // Clear square content
+        square.className = ''; // Remove all classes from the square
+        square.style.pointerEvents = 'auto'; 
+    });
+});
+
