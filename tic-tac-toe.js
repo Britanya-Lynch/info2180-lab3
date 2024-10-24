@@ -1,166 +1,136 @@
+// Global variables 
+let boardState = Array(9).fill(null);  // Tracks the state of the board
+let isXPlayerTurn = true;  // Track whose turn it is 
 
-// Exercise 1
+
+
+// Exercise 1 
 // Adding an event handler to execute functions when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", function () {
-    // Storing the elements in div called board into (square)
-    let squares = document.querySelectorAll("#board div");
+    const squares = document.querySelectorAll("#board div");   // Storing the elements in div called board into (square)
 
-    // The square function is for each element in div
-    squares.forEach(function (square) {
-            square.classList.add("square");  // Adding the class
-            console.log("Square styled:", square);  // To track the progress of each square being logged to be styled
+    // Adding the 'square' class with click events
+    squares.forEach((square, index) => {
+        square.classList.add("square");  // Add 'square' class for styling
+        square.addEventListener("click", () => handleSquareClick(square, index));  // Add click event for handling player moves
+        square.addEventListener("mouseover", handleMouseOver);  // Add hover effect
+        square.addEventListener("mouseout", handleMouseOut);  // Remove hover effect
     });
+
+    // Attach event listener for the New Game button
+    const newGameButton = document.querySelector(".btn");
+    newGameButton.addEventListener("click", resetGame);  // Reset the game when "New Game" button is clicked
 });
 
 
 
+// Exercise 2 
+// Function to handle clicks on squares
+function handleSquareClick(square, index) {
+    // Check if the square is empty and game is not won yet
+    if (!boardState[index] && !checkForWinner()) {
+        square.textContent = isXPlayerTurn ? "X" : "O";  // Mark the square with X or O
+        boardState[index] = isXPlayerTurn ? "X" : "O";  // Update the board state
+        square.classList.add(isXPlayerTurn ? "X" : "O");  // Add the player's class for styling
 
-// Exercise 2
-let playerX = "X";  // Initializing player X
-let playerO = "O";  // Initializing player O
-let currentPlayer = playerX;  // Start the game with player X
-let gameBoard = Array(9).fill(null);  // Initialize game board with 9 nulls
+        isXPlayerTurn = !isXPlayerTurn;  // Switch to the other player's turn
 
-// Selects all the elements with div id "board", then goes through each element in varying positions
-document.querySelectorAll("#board div").forEach(function (square, index) {
-    square.addEventListener("click", function () { // Adds a click event listener function so it can address the square on command
-        if (gameBoard[index] === "") {  // If the square is empty then ..
-            square.textContent = currentPlayer; // It will take the content inside the square as the value to represent the current player
-            square.classList.add(currentPlayer); // It will add the value used to the square
-            gameBoard[index] = currentPlayer; // Tracks the moves being made by current player
-            
-            // The code checks if the current player is playerX. If true, it switches the currentPlayer to playerO. Otherwise, 
-            // it sets the currentPlayer back to playerX, ensuring the players alternate between X and O.
-            if (currentPlayer === playerX) {
-                currentPlayer = playerO;  // If currentPlayer is 'X', set it to 'O'
-            } else {
-                currentPlayer = playerX;  // If currentPlayer is not 'X' (thus it's 'O'), set it to 'X'
-            }
-            
+        if (checkForWinner()) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = `Congratulations! ${boardState[index]} is the Winner!`;  // Display winner message
+            statusDiv.classList.add('you-won');  // Add 'you-won' class for styling
         }
-    });
-});
-
-
-
-// Excerise 3
-// Function to change style when mouse hovers over square
-document.addEventListener("DOMContentLoaded", function () {
-    let squares = document.querySelectorAll("#board div");
-  
-    // Add event listeners for hover effect
-    squares.forEach(function (square) {
-      square.addEventListener("mouseover", handleMouseOver);   
-      square.addEventListener("mouseout", handleMouseOut);    
-    });
-  });
-  
-  // Function to handle hover (mouseover) effect
-  function handleMouseOver(event) {
-    const gameSquare = event.target;  // Get the square that triggered the event
-    // Add hover class only if the square is empty
-    if (gameSquare.textContent === "") {
-      gameSquare.classList.add("hover");
     }
-  }
-  
-  // Function to handle mouseout effect (removing hover class)
-  function handleMouseOut(event) {
-    const gameSquare = event.target;  // Get the square that triggered the event
-    gameSquare.classList.remove("hover");
-  }
-  
-  
+}
+
+
+
+// Exercise 3 
+// Function to handle hover effect when the mouse enters or leaves a square
+function handleMouseOver(event) {
+    const square = event.target;  // Get the square that triggered the event
+    if (!square.textContent) {  // Only add hover effect if the square is empty
+        square.classList.add("hover");
+    }
+}
+
+function handleMouseOut(event) {
+    const square = event.target;  // Get the square that triggered the event
+    square.classList.remove("hover");  // Remove hover class when the mouse leaves
+}
+
+
 
 // Exercise 4 
-let gameState = Array(9).fill(null), isXTurn = true; 9  // squares and each is being tracked for turns
-
-// Define all possible winning combinations (rows, columns, and diagonals) 
-const winningCombinations = [
-  [0, 1, 2], /* Top row */         [3, 4, 5],/*Middle row*/         [6, 7, 8],// Bottom row
-  [0, 3, 6], /* First column*/     [1, 4, 7], /*Second column*/     [2, 5, 8], // Third column
-  [0, 4, 8], /*Left diagonal*/     [2, 4, 6]  // Right diagonal
-];
-
-// Wait for the DOM to fully load before accessing elements
-document.addEventListener("DOMContentLoaded", () => {
-  const squares = document.querySelectorAll("#board div"); // Select all squares (div elements) in the board
-
-  // Loop through each square and assign a click event
-  squares.forEach((square, i) => {
-    square.onclick = () => {
-      // If the square is already filled (gameState[i] is not null) or the game is already won, do nothing
-      if (gameState[i] || checkForWinner()) return;
-      square.textContent = gameState[i] = isXTurn ? "X" : "O";   // Set the square's text content to 'X' or 'O' depending on the player's turn
-      isXTurn = !isXTurn;  // Switch turns: if it was 'X's turn, now it's 'O's, and vice versa
-      checkForWinner(); // Check if the current move resulted in a win
-    };
-  });
-});
-
-// Function to check if there's a winner
-// This function looks through all the winning combinations and checks if any of them are satisfied
+// Function to check for a winner by comparing the board state to winning combinations
 function checkForWinner() {
-  // Finding the winning condition
-  const winner = winningCombinations.find(([a, b, c]) => 
-    gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]);
-
-  // If a winner is found (the winning combination exists)
-  if (winner) {
-    const winnerPlayer = gameState[winner[0]]; // Get the winning player ('X' or 'O')
-    const statusDiv = document.getElementById('status'); // Update the status div with a winning message and add the 'you-won' class for styling
-    statusDiv.textContent = `Congratulations! ${winnerPlayer} is the Winner!`;
-    statusDiv.classList.add('you-won');
-
-    // Disable further clicks on the board once there's a winner
-    document.querySelectorAll("#board div").forEach(sq => sq.style.pointerEvents = "none");
-
-    return true; // Return true to indicate a winner was found
-  }
-  return false; // If none isnt found
+    const winningCombinations = [
+        [0, 1, 2], /* Top row */         [3, 4, 5],/*Middle row*/         [6, 7, 8],// Bottom row
+        [0, 3, 6], /* First column*/     [1, 4, 7], /*Second column*/     [2, 5, 8], // Third column
+        [0, 4, 8], /*Left diagonal*/     [2, 4, 6]  // Right diagonal
+    ];
+   
+    for (let combination of winningCombinations) {
+        const [a, b, c] = combination;
+        if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+            return true;  // A winning combination is found
+        }
+    }
+    return false;  // No winner found yet
 }
 
 
 
-// Exercise 5
-// Restart the game
-document.getElementById('Restart').addEventListener('click', () => {
-    // Reset status message
-    const statusMsg = document.getElementById('status');
-    statusMsg.textContent = 'Move your mouse over a square and click to play an X or an O.';
-    statusMsg.classList.remove('you-won'); // Removing 'you-won' class
+// Exercise 5 
+// Function to reset the game when "New Game" button is clicked
+function resetGame() {
+    // Reset game state
+    boardState = Array(9).fill(null);  // Clear the board state
+    isXPlayerTurn = true;  // Set turn back to player X
 
-    // Reset game state and player turn
-    boardState = Array(9).fill(null); // Clear the board state
-    isXPlayer = true; // Setting X as the first player
+    // Reset the status message
+    const statusDiv = document.getElementById('status');
+    statusDiv.textContent = 'Move your mouse over a square and click to play an X or an O.';  // Reset the status message
+    statusDiv.classList.remove('you-won');  // Remove the 'you-won' class
 
-    // Reset each square's content and re-enable clicks
+    // Clear each square's content and classes, re-enable clicks
     document.querySelectorAll('#board div').forEach(square => {
-        square.textContent = ''; // Clear square content
-        square.className = ''; // Remove all classes from the square
-        square.style.pointerEvents = 'auto'; 
+        square.textContent = '';  // Clear the text content
+        square.className = 'square';  // Reset the class to 'square'
+    });
+}
+
+
+
+// Exercise 6 
+// Ensure users cannot change the value of squares that already have an X or O
+document.querySelectorAll("#board div").forEach((square, index) => {
+    square.addEventListener("click", () => {
+        if (boardState[index]) return;  // Prevent the user from changing a square that is already filled
+        handleSquareClick(square, index);  // Otherwise, allow the move
     });
 });
 
 
 
-// Exercise 6  
-const squares = document.querySelectorAll('#board div');
 
-for (let i = 0; i < squares.length; i++) {
-    squares[i].addEventListener('click', () => {
-        // Prevent changes if the square already has a value
-        if (squares[i].textContent) return; 
 
-        // Set the square's content and update the board state
-        const player = isXPlayer ? 'X' : 'O';
-        squares[i].textContent = player;
-        squares[i].classList.add(player);
 
-        // Toggle player turn
-        isXPlayer = !isXPlayer;
 
-        // Check for a winner
-        checkForWinner();
-    });
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
